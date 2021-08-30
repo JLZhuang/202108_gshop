@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="order">
     <HeaderTop title="订单列表"/>
     <section class="order_no_login">
       <img src="./images/person.png">
@@ -8,15 +8,17 @@
     </section>
   </div>
 </template>
+
 <script>
-import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
-export default {
-  components:{
-    HeaderTop
+  import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+  export default {
+    components: {
+      HeaderTop
+    }
   }
-}
 </script>
-<style lang='stylus' rel='stylesheet/stylus'>
+
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   .order
     width 100%
     height 100%

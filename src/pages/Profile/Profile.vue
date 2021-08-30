@@ -92,17 +92,35 @@
     <section class="profile_my_order border-1px" v-if="userInfo._id">
       <mt-button class="logout" type="danger" @click="logout">退出登陆</mt-button>
     </section>
+
   </section>
 </template>
+
 <script>
-import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
-export default {
-  components:{
-    HeaderTop
+  import {mapState} from 'vuex'
+  import Cookies from 'js-cookie'
+  import {MessageBox} from 'mint-ui'
+  import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+  export default {
+    computed: {
+      ...mapState(['userInfo'])
+    },
+
+    methods: {
+      logout () {
+        MessageBox.confirm('确定退出登陆吗?').then(action => {
+          this.$store.dispatch('logout')
+        });
+      }
+    },
+
+    components: {
+      HeaderTop
+    }
   }
-}
 </script>
-<style lang='stylus' rel='stylesheet/stylus'>
+
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "../../common/stylus/mixins.styl"
   .profile //我的
     width 100%

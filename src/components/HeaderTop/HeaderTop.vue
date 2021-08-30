@@ -7,14 +7,16 @@
     <slot name="login"></slot>
   </header>
 </template>
+
 <script>
-export default {
-  props: {
-    title: String
+  export default {
+    props: {
+      title: String
+    }
   }
-}
 </script>
-<style lang='stylus' rel='stylesheet/stylus'>
+
+<style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
   .header
     background-color #02a774

@@ -28,71 +28,108 @@
     <div class="search_none" v-if="emptyResult">很抱歉！无搜索结果</div>
   </section>
 </template>
+
 <script>
-import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
-export default {
-  components:{
-    HeaderTop
+  import {mapState} from 'vuex'
+  import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+  export default {
+
+    data () {
+      return {
+        emptyResult: false,
+        imgBaseUrl: 'http://cangdu.org:8001/img/',
+        keyword: ''
+      }
+    },
+
+    computed: {
+      ...mapState(['searchShops'])
+    },
+
+    methods: {
+      search () {
+        const keyword = this.keyword.trim()
+        if(keyword) {
+          this.emptyResult = false
+          this.$store.dispatch('searchShop', keyword)
+        }
+      }
+    },
+
+    watch: {
+      searchShops (val) {
+        if(!val.length) {
+          this.emptyResult = true
+        }
+      }
+    },
+
+    components: {
+      HeaderTop
+    }
   }
-}
 </script>
-<style lang='stylus' rel='stylesheet/stylus'>
+
+<style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "../../common/stylus/mixins.styl"
-  .msite
+
+  .search
     width 100%
-    height: 100%
-    .miste-content-wrapper
-      position fixed
-      top: 45px
-      bottom: 46px
-      width: 100%
-    .msite_nav
-      bottom-border-1px(#e4e4e4)
-      height 200px
-      background #fff
-      .swiper-container
-        width 100%
-        height 100%
-        .swiper-wrapper
-          width 100%
-          height 100%
-          .swiper-slide
-            display flex
-            justify-content center
-            align-items flex-start
-            flex-wrap wrap
-            .link_to_food
-              width 25%
-              .food_container
-                display block
-                width 100%
-                text-align center
-                padding-bottom 10px
-                font-size 0
-                img
-                  display inline-block
-                  width 50px
-                  height 50px
-              span
-                display block
-                width 100%
-                text-align center
-                font-size 13px
-                color #666
-        .swiper-pagination
-          >span.swiper-pagination-bullet-active
-            background #02a774
-    .msite_shop_list
-      top-border-1px(#e4e4e4)
-      margin-top 10px
-      background #fff
-      .shop_header
-        padding 10px 10px 0 10px
-        .shop_icon
-          margin-left 5px
-          color #999
-        .shop_header_title
-          color #999
+    height 100%
+    overflow hidden
+    .search_form
+      clearFix()
+      margin-top 45px
+      background-color #fff
+      padding 12px 8px
+      input
+        height 35px
+        padding 0 4px
+        border-radius 2px
+        font-weight bold
+        outline none
+        &.search_input
+          float left
+          width 79%
+          border 4px solid #f2f2f2
           font-size 14px
-          line-height 20px
+          color #333
+          background-color #f2f2f2
+        &.search_submit
+          float right
+          width 18%
+          border 4px solid #02a774
+          font-size 16px
+          color #fff
+          background-color #02a774
+
+    .list
+      .list_container
+        background-color: #fff;
+        .list_li
+          display: flex;
+          justify-content: center;
+          padding: 10px
+          border-bottom: 1px solid $bc;
+          .item_left
+            margin-right: 10px
+            .restaurant_img
+              width 50px
+              height 50px
+              display block
+          .item_right
+            font-size 12px
+            flex 1
+            .item_right_text
+              p
+                line-height 12px
+                margin-bottom 6px
+                &:last-child
+                  margin-bottom 0
+    .search_none
+      margin: 0 auto
+      color: #333
+      background-color: #fff
+      text-align: center
+      margin-top: 0.125rem
 </style>

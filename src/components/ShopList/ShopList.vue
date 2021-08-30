@@ -51,7 +51,22 @@
 </template>
 
 <script>
+  import {mapState} from 'vuex'
+  import Star from '../Star/Star.vue'
 
+  export default {
+    data () {
+      return {
+        imgBaseUrl: 'http://cangdu.org:8001/img/'
+      }
+    },
+    computed: {
+      ...mapState(['shops'])
+    },
+    components: {
+      Star
+    }
+  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

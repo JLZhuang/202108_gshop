@@ -44,27 +44,82 @@
     </div>
   </div>
 </template>
+
 <script>
-import Swiper from 'swiper'
-import 'swiper/dist/css/swiper.min.css'
-import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
-import ShopList from '../../components/ShopList/ShopList.vue'
-export default {
-  mounted () {
-    new Swiper('.swiper-container',{
-      loop:true,
-      pagination: {
-        el: '.swiper-pagination',
+  import {mapState} from 'vuex'
+  import BScroll from 'better-scroll'
+  import Swiper from 'swiper'
+  import 'swiper/dist/css/swiper.min.css'
+  import HeaderTop from '../../components/HeaderTop/HeaderTop.vue'
+  import ShopList from '../../components/ShopList/ShopList.vue'
+
+  export default {
+
+    data () {
+      return {
+        imgBaseUrl: 'https://fuss10.elemecdn.com'
       }
-    })
-  },
-  components:{
-    HeaderTop,
-    ShopList
+    },
+
+    mounted () {
+      this.$store.dispatch('getCategorys')
+      this.$store.dispatch('getShops')
+    },
+
+    computed: {
+      ...mapState(['address', 'categorys', 'userInfo']),
+
+      categorysArr () {
+        const max = 8
+        const arr = []
+        const {categorys} = this
+        let tempArr = null
+        categorys.forEach((c, index) => {
+          if(!tempArr) {
+            tempArr = []
+            arr.push(tempArr)
+          }
+          if(tempArr.length<max) {
+            tempArr.push(c)
+          }
+          if(tempArr.length===max) {
+            tempArr = null
+          }
+        })
+
+        return arr
+      }
+    },
+
+    watch: {
+
+    },
+
+    watch: {
+      categorys(value) {
+        this.$nextTick(() => {
+          new Swiper('.swiper-container', {
+            pagination: {
+              el: '.swiper-pagination',
+            },
+            loop: true
+          })
+
+          new BScroll('.miste-content-wrapper', {
+            click: true
+          })
+        })
+      },
+    },
+
+    components: {
+      HeaderTop,
+      ShopList
+    }
   }
-}
 </script>
-<style lang='stylus' rel='stylesheet/stylus'>
+
+<style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
   .msite
     width 100%
@@ -123,4 +178,6 @@ export default {
           color #999
           font-size 14px
           line-height 20px
+
+
 </style>

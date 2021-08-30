@@ -1,7 +1,10 @@
 import axios from 'axios'
-export default function ajax (url, data={}, type='GET') {
-  return new Promise(function (resolve, reject){
+
+export default function ajax(url = '', data = {}, type = 'GET') {
+  return new Promise(function (resolve, reject) {
+
     let promise
+
     if (type === 'GET') {
       // 准备url query参数数据
       let dataStr = '' //数据拼接字符串
@@ -18,10 +21,12 @@ export default function ajax (url, data={}, type='GET') {
       // 发送post请求
       promise = axios.post(url, data)
     }
-    promise.then(function (response) {
+
+    promise.then(response => {
       resolve(response.data)
-    }).catch(function (error) {
-      reject(error)
     })
+      .catch(error => {
+        reject(error)
+      })
   })
 }

@@ -46,7 +46,7 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img ref="captcha" class="get_verification" src="http://localhost:3000/captcha" alt="captcha" @click="getCaptchaCode">
+                <img ref="captcha" class="get_verification" src="http://localhost:4000/captcha" alt="captcha" @click="getCaptchaCode">
               </section>
             </section>
           </div>
@@ -63,9 +63,146 @@
                :alertText="alertText"/>
   </div>
 </template>
-<script>
 
+<script>
+  import {mapActions} from 'vuex'
+  import {reqCaptchas, sendCode, smsLogin, pwdLogin} from '../../api'
+  import AlertTip from '../../components/AlertTip/AlertTip.vue'
+
+  export default {
+    data() {
+      return {
+        loginWay: false, //登录方式，false代表密码登录, true代表短信登陆
+        showPassword: false, // 是否显示密码
+        computedTime: 0, //倒数记时
+        phone: '', //电话号码
+        code: '', //短信验证码
+        name: '', //用户名
+        pwd: '', //密码
+        captcha: '', // 验证码
+        captchaImg: null, //验证码图片
+        showAlert: false, //显示提示组件
+        alertText: null, //提示的内容
+      }
+    },
+
+    computed: {
+      //判断手机号码
+      rightPhoneNumber: function () {
+        return /^1\d{10}$/.test(this.phone)
+      }
+    },
+
+    methods: {
+      ...mapActions([
+        'recordUserInfo',
+      ]),
+
+      // 设置登录方式
+      setLoginWay(loginWay) {
+        this.loginWay = loginWay
+      },
+      //是否显示密码
+      changePassWordType() {
+        this.showPassword = !this.showPassword
+      },
+      // 获取图形验证码
+      getCaptchaCode() {
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time='+new Date()
+      },
+
+      // 获取短信验证码
+      async getVerifyCode() {
+        if (this.rightPhoneNumber) {
+          this.computedTime = 30
+          this.intervalId = setInterval(() => {
+            this.computedTime--
+            if (this.computedTime == 0) {
+              clearInterval(this.intervalId)
+            }
+          }, 1000)
+          //发送短信验证码
+          let result = await sendCode(this.phone)
+          if (result.code===1) {
+            this.showAlert = true
+            this.alertText = result.msg
+          }
+        }
+      },
+
+      // 发送登录信息
+      async login() {
+        // debugger
+        if (this.loginWay) {
+          if (!this.phone) {
+            this.showAlert = true;
+            this.alertText = '手机号码不正确'
+            return
+          } else if (!(/^\d{6}$/gi.test(this.code))) {
+            this.showAlert = true;
+            this.alertText = '短信验证码不正确'
+            return
+          }
+
+          //手机号短信登录
+          const result = await smsLogin(this.phone, this.code);
+          if(result.code===0) {
+            this.userInfo = result.data
+          } else {
+            this.userInfo = {
+              msg: '登陆失败, 手机号或验证不正确'
+            }
+          }
+
+        } else {
+          if (!this.name) {
+            this.showAlert = true
+            this.alertText = '请输入手机号/邮箱/用户名'
+            return
+          } else if (!this.pwd) {
+            this.showAlert = true;
+            this.alertText = '请输入密码'
+            return
+          } else if (!this.captcha) {
+            this.showAlert = true
+            this.alertText = '请输入验证码'
+            return
+          }
+
+          //用户名登录
+          const result = await pwdLogin(this.name, this.pwd, this.captcha)
+          if(result.code===0) {
+            this.userInfo = result.data
+          } else {
+            this.userInfo = {
+              msg: result.msg
+            }
+          }
+        }
+        //如果返回的值不正确，则弹出提示框，返回的值正确则返回上一页
+        if (!this.userInfo._id) {
+          this.showAlert = true
+          this.alertText = this.userInfo.msg
+          if (!this.loginWay) {
+            this.getCaptchaCode()
+          }
+        } else {
+          this.recordUserInfo(this.userInfo)
+          this.$router.back()
+        }
+      },
+      // 关系提示框
+      closeTip() {
+        this.showAlert = false
+      }
+    },
+
+    components: {
+      AlertTip
+    }
+  }
 </script>
+
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   @import "../../common/stylus/mixins.styl"
   .loginContainer
